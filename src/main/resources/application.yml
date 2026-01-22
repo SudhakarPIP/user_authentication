@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: user-authentication-service
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/pip?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: Svmr12!@
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # Changed to update - Hibernate will create/update tables
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: false  # Temporarily disabled - change to true after fixing migrations
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:userauth121@gmail.com}
+    password: ${MAIL_PASSWORD:rewylyqamrdllsht}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+logging:
+  level:
+    root: INFO
+    com.auth: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/auth-service.log
+    max-size: 10MB
+    max-history: 30
+
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-change-in-production-min-256-bits-please-use-a-strong-secret-key}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+  email:
+    enabled: ${EMAIL_ENABLED:false}  # Set to false to disable email (for development)
+    from: ${APP_EMAIL_FROM:noreply@authservice.com}
+
+server:
+  port: ${SERVER_PORT:8080}
+
