@@ -31,19 +31,19 @@ spring:
     validate-on-migrate: true
 
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
+    host: ${MAIL_HOST:smtp.mailtrap.io}
+    port: ${MAIL_PORT:2525}
     username: ${MAIL_USERNAME:userauth121@gmail.com}
-    password: ${MAIL_PASSWORD:rewylyqamrdllsht}
+    password: ${MAIL_PASSWORD:91c0f020b6a54acf489e41d519d6e09e}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+          connectiontimeout: 30000
+          timeout: 30000
+          writetimeout: 30000
 
 logging:
   level:
@@ -64,8 +64,8 @@ jwt:
 app:
   base-url: ${APP_BASE_URL:http://localhost:8080}
   email:
-    enabled: ${EMAIL_ENABLED:false}  # Set to false to disable email (for development)
-    from: ${APP_EMAIL_FROM:noreply@authservice.com}
+    enabled: ${EMAIL_ENABLED:false}  # Disabled due to network/firewall blocking SMTP
+    from: ${APP_EMAIL_FROM:userauth121@gmail.com}
 
 server:
   port: ${SERVER_PORT:8080}
