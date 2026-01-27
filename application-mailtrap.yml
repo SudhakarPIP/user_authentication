@@ -1,0 +1,24 @@
+# Mailtrap Configuration for Testing
+# Use this when Gmail SMTP is blocked by firewall
+
+spring:
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: YOUR_MAILTRAP_USERNAME  # Get from https://mailtrap.io
+    password: YOUR_MAILTRAP_PASSWORD  # Get from https://mailtrap.io
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 30000
+          timeout: 30000
+          writetimeout: 30000
+
+app:
+  email:
+    enabled: true
+    from: noreply@authservice.com
+
