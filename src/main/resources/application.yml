@@ -6,9 +6,9 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
   datasource:
-    url: jdbc:mysql://localhost:3306/pip?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-    username: root
-    password: Svmr12!@
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:pip}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -25,7 +25,7 @@ spring:
         format_sql: true
 
   flyway:
-    enabled: false  # Temporarily disabled - change to true after fixing migrations
+    enabled: ${FLYWAY_ENABLED:true}
     locations: classpath:db/migration
     baseline-on-migrate: true
     validate-on-migrate: true
@@ -33,8 +33,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.mailtrap.io}
     port: ${MAIL_PORT:2525}
-    username: ${MAIL_USERNAME:userauth121@gmail.com}
-    password: ${MAIL_PASSWORD:91c0f020b6a54acf489e41d519d6e09e}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -64,8 +64,8 @@ jwt:
 app:
   base-url: ${APP_BASE_URL:http://localhost:8080}
   email:
-    enabled: ${EMAIL_ENABLED:false}  # Disabled due to network/firewall blocking SMTP
-    from: ${APP_EMAIL_FROM:userauth121@gmail.com}
+    enabled: ${EMAIL_ENABLED:true}
+    from: ${APP_EMAIL_FROM:noreply@authservice.com}
 
 server:
   port: ${SERVER_PORT:8080}
