@@ -14,30 +14,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Global exception handler for centralized error handling across all REST controllers.
+ * 
+ * Handles all exceptions thrown by controllers and services, providing consistent
+ * error responses with appropriate HTTP status codes.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse> handleIllegalArgumentException(IllegalArgumentException e) {
-        logger.error("IllegalArgumentException: {}", e.getMessage());
-        ApiResponse response = ApiResponse.builder()
-                .message(e.getMessage())
-                .success(false)
-                .build();
-        return ResponseEntity.badRequest().body(response);
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiResponse> handleIllegalStateException(IllegalStateException e) {
-        logger.error("IllegalStateException: {}", e.getMessage());
-        ApiResponse response = ApiResponse.builder()
-                .message(e.getMessage())
-                .success(false)
-                .build();
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-    }
-
+    /**
+     * Handles validation errors from @Valid annotation.
+     * Returns field-level validation errors.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException e) {
         logger.error("Validation error: {}", e.getMessage());
@@ -50,6 +40,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    /**
+     * Handles missing required request parameters.
+     * Used when required @RequestParam is missing.
+     */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ApiResponse> handleMissingParameter(MissingServletRequestParameterException e) {
         logger.error("Missing request parameter: {}", e.getParameterName());
@@ -60,16 +54,39 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse> handleRuntimeException(RuntimeException e) {
-        logger.error("RuntimeException: {}", e.getMessage(), e);
+    /**
+     * Handles IllegalArgumentException - used for invalid input/business logic errors.
+     * Examples: Username/email already exists, invalid credentials, invalid token.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        logger.error("IllegalArgumentException: {}", e.getMessage());
         ApiResponse response = ApiResponse.builder()
-                .message(e.getMessage() != null ? e.getMessage() : "An error occurred")
+                .message(e.getMessage())
                 .success(false)
                 .build();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.badRequest().body(response);
     }
 
+    /**
+     * Handles IllegalStateException - used for invalid state errors.
+     * Example: Account not activated (email not verified).
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse> handleIllegalStateException(IllegalStateException e) {
+        logger.error("IllegalStateException: {}", e.getMessage());
+        ApiResponse response = ApiResponse.builder()
+                .message(e.getMessage())
+                .success(false)
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    /**
+     * Handles all other unexpected exceptions.
+     * This is a catch-all handler for any unhandled exceptions.
+     * In production, this prevents exposing internal error details to clients.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleGenericException(Exception e) {
         logger.error("Unexpected error: {}", e.getMessage(), e);

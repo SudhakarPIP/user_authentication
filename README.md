@@ -17,6 +17,7 @@ A production-grade authentication service built with Spring Boot, MySQL, Jenkins
 - [Testing](#testing)
 - [CI/CD](#cicd)
 - [AWS Deployment](#aws-deployment)
+- [Diagrams](#diagrams)
 - [Project Structure](#project-structure)
 - [Documentation](#documentation)
 
@@ -53,7 +54,7 @@ A production-grade authentication service built with Spring Boot, MySQL, Jenkins
 ### Users Table
 
 | Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
+|:------|:-----|:-----------|:-----------|
 | `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier |
 | `username` | VARCHAR(50) | NOT NULL, UNIQUE | Username (case-insensitive unique) |
 | `name` | VARCHAR(100) | NOT NULL | User's full name |
@@ -69,7 +70,7 @@ A production-grade authentication service built with Spring Boot, MySQL, Jenkins
 ### Verification Tokens Table
 
 | Field | Type | Constraints | Description |
-|-------|------|-------------|-------------|
+|:------|:-----|:-----------|:-----------|
 | `id` | BIGINT | PRIMARY KEY, AUTO_INCREMENT | Unique identifier |
 | `user_id` | BIGINT | NOT NULL, FOREIGN KEY | Reference to users.id |
 | `token` | VARCHAR(100) | NOT NULL, UNIQUE | Verification token |
@@ -397,43 +398,188 @@ user_authentication_init/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/auth/
-│   │   │   ├── controller/          # REST API endpoints
-│   │   │   ├── service/             # Business logic
-│   │   │   ├── repository/         # Data access layer
-│   │   │   ├── entity/              # JPA entities
-│   │   │   ├── dto/                 # Data transfer objects
-│   │   │   ├── config/              # Configuration classes
-│   │   │   ├── util/                # Utility classes (JWT)
-│   │   │   └── exception/           # Exception handlers
+│   │   │   ├── UserAuthenticationApplication.java    # Main application class
+│   │   │   │
+│   │   │   ├── controller/                           # REST API Layer
+│   │   │   │   ├── AuthController.java               # Signup, Verify, Login endpoints
+│   │   │   │   ├── TestMailController.java          # Email testing endpoints
+│   │   │   │   └── EmailDebugController.java         # Email config debug (dev only)
+│   │   │   │
+│   │   │   ├── service/                              # Business Logic Layer
+│   │   │   │   ├── AuthService.java                  # Authentication business logic
+│   │   │   │   └── EmailService.java                 # Email sending service
+│   │   │   │
+│   │   │   ├── repository/                          # Data Access Layer
+│   │   │   │   ├── UserRepository.java              # User data access
+│   │   │   │   └── VerificationTokenRepository.java # Token data access
+│   │   │   │
+│   │   │   ├── entity/                               # JPA Entities
+│   │   │   │   ├── User.java                         # User entity
+│   │   │   │   └── VerificationToken.java           # Verification token entity
+│   │   │   │
+│   │   │   ├── dto/                                  # Data Transfer Objects
+│   │   │   │   ├── SignupRequest.java               # Signup request DTO
+│   │   │   │   ├── LoginRequest.java                # Login request DTO
+│   │   │   │   ├── AuthResponse.java                # Authentication response DTO
+│   │   │   │   └── ApiResponse.java                 # Generic API response DTO
+│   │   │   │
+│   │   │   ├── config/                               # Configuration Classes
+│   │   │   │   └── SecurityConfig.java               # Spring Security configuration
+│   │   │   │
+│   │   │   ├── util/                                 # Utility Classes
+│   │   │   │   └── JwtUtil.java                      # JWT token generation/validation
+│   │   │   │
+│   │   │   └── exception/                            # Exception Handling
+│   │   │       └── GlobalExceptionHandler.java        # Centralized exception handler
+│   │   │
 │   │   └── resources/
-│   │       ├── application.yml      # Main configuration
-│   │       ├── application-dev.yml  # Development profile
-│   │       ├── application-prod.yml # Production profile
-│   │       └── db/migration/        # Flyway migrations
+│   │       ├── application.yml                       # Main configuration
+│   │       ├── application-dev.yml                   # Development profile
+│   │       ├── application-prod.yml                  # Production profile
+│   │       └── db/migration/                         # Flyway database migrations
+│   │           ├── V1__Create_users_table.sql        # Users table migration
+│   │           └── V2__Create_verification_tokens_table.sql  # Tokens table migration
+│   │
 │   └── test/
 │       ├── java/com/auth/
-│       │   ├── service/             # Unit tests
-│       │   ├── controller/          # Controller tests
-│       │   └── integration/         # Integration tests
+│       │   ├── service/                              # Unit Tests - Service Layer
+│       │   │   ├── AuthServiceTest.java             # AuthService unit tests
+│       │   │   └── EmailServiceTest.java            # EmailService unit tests
+│       │   │
+│       │   ├── controller/                           # Unit Tests - Controller Layer
+│       │   │   └── AuthControllerTest.java           # AuthController unit tests
+│       │   │
+│       │   └── integration/                          # Integration Tests
+│       │       ├── AuthIntegrationTest.java          # End-to-end API tests
+│       │       ├── RealEmailIntegrationTest.java    # Real email sending tests
+│       │       └── MailtrapApiTest.java              # Mailtrap API tests
+│       │
 │       └── resources/
-│           └── application-test.yml
-├── docs/
-│   ├── SEQUENCE_DIAGRAM.md          # Sequence diagrams
-│   ├── ARCHITECTURE_DIAGRAM.md       # Architecture diagram
-│   ├── AWS_DEPLOYMENT.md            # AWS deployment guide
-│   ├── QUICK_START.md               # Quick start guide
-│   ├── API_TESTING.md               # API testing guide
-│   ├── TEST_COVERAGE.md             # Test coverage details
-│   ├── CODE_IMPROVEMENTS.md         # Code improvements
-│   └── DATABASE_REQUIREMENTS.md     # Database requirements
-├── postman/
-│   ├── User_Authentication_API.postman_collection.json
-│   └── README.md
-├── Jenkinsfile                      # CI/CD pipeline
-├── pom.xml                          # Maven configuration
-├── README.md                        # This file
-└── DELIVERABLES_CHECKLIST.md        # Deliverables checklist
+│           └── application-test.yml                  # Test configuration
+│
+├── docs/                                             # Documentation
+│   ├── SEQUENCE_DIAGRAM.md                          # Sequence diagrams (Signup, Verify, Login)
+│   ├── ARCHITECTURE_DIAGRAM.md                       # System architecture diagram
+│   ├── AWS_DEPLOYMENT.md                            # AWS deployment guide
+│   ├── QUICK_START.md                               # Quick start guide
+│   ├── API_TESTING.md                               # API testing guide
+│   ├── TEST_COVERAGE.md                             # Test coverage details
+│   └── [Additional documentation files]
+│
+├── postman/                                          # Postman Collection
+│   ├── User_Authentication_API.postman_collection.json  # Postman collection
+│   ├── README.md                                     # Postman usage guide
+│   └── API_REQUEST_BODIES.md                        # Request body examples
+│
+├── Jenkinsfile                                       # Jenkins CI/CD pipeline
+├── pom.xml                                           # Maven configuration
+├── README.md                                         # This file
+└── DELIVERABLES_CHECKLIST.md                        # Deliverables checklist
 ```
+
+### Package Structure Details
+
+**Controller Layer** (`controller/`):
+- Handles HTTP requests/responses
+- Validates input using `@Valid`
+- Delegates business logic to services
+- No business logic or exception handling (handled by GlobalExceptionHandler)
+
+**Service Layer** (`service/`):
+- Contains all business logic
+- Validates business rules (username/email uniqueness, account activation)
+- Manages transactions (`@Transactional`)
+- Throws specific exceptions (IllegalArgumentException, IllegalStateException)
+
+**Repository Layer** (`repository/`):
+- Data access using Spring Data JPA
+- Custom queries for case-insensitive lookups
+- No business logic
+
+**Entity Layer** (`entity/`):
+- JPA entities mapping to database tables
+- Defines relationships and constraints
+
+**DTO Layer** (`dto/`):
+- Request/Response objects
+- Validation annotations
+- Separates API contract from internal entities
+
+**Config Layer** (`config/`):
+- Spring configuration classes
+- Security configuration
+
+**Util Layer** (`util/`):
+- Utility classes (JWT generation/validation)
+- Reusable helper methods
+
+**Exception Layer** (`exception/`):
+- Centralized exception handling
+- Consistent error responses
+- Proper HTTP status codes
+
+## 📊 Diagrams
+
+This project includes comprehensive diagrams that illustrate the system architecture and authentication flows. All diagrams are located in the [`docs/`](docs/) folder and use Mermaid format for easy viewing in GitHub, GitLab, and most Markdown viewers.
+
+### Sequence Diagrams
+
+The sequence diagrams illustrate the complete flow of all authentication operations with detailed component interactions:
+
+📄 **[View Complete Sequence Diagrams](docs/SEQUENCE_DIAGRAM.md)**
+
+**Included Flows**:
+
+1. **Signup Flow**
+   - Client → AuthController → Service → Repo → DB
+   - MailService → SMTP/Mailtrap email sending
+   - Complete validation and error handling
+
+2. **Email Verification Flow**
+   - Token validation flow with all checks
+   - Token existence, expiration, and usage validation
+   - Account activation process
+
+3. **Login Flow**
+   - Complete authentication flow with JWT generation
+   - Username/Email lookup (case-insensitive)
+   - Password verification and token generation
+
+**Key Components Shown**:
+- ✅ Client → AuthController → Service → Repo → DB
+- ✅ MailService → SMTP/Mailtrap
+- ✅ Token validation flow
+- ✅ Error handling paths (alt blocks)
+- ✅ JWT token generation
+
+### Architecture Diagram
+
+The architecture diagram shows the complete system design, component interactions, and deployment architecture:
+
+📄 **[View Complete Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.md)**
+
+**Components Included**:
+- ✅ **API Layer**: Spring Boot Application (REST API, Controllers, Services, Repositories)
+- ✅ **Database Layer**: RDS MySQL (Primary Database + Read Replica)
+- ✅ **Email Service**: AWS SES (Production) + SMTP/Mailtrap (Development)
+- ✅ **CI/CD Pipeline**: Jenkins Server (Build, Test, Deploy)
+- ✅ **AWS Compute**: EC2 Instance + ECS Container (optional)
+- ✅ **Infrastructure**: Load Balancer (ALB), Secrets Manager, Parameter Store, S3, CloudWatch, SNS
+
+**Additional Details**:
+- Component descriptions and responsibilities
+- Data flow documentation
+- Environment configurations (dev/prod)
+- Security architecture
+- Monitoring and logging setup
+
+**Diagram Format**: Mermaid (renders automatically in GitHub, GitLab, and most Markdown viewers)
+
+---
+
+**Quick Links**:
+- 📊 [Sequence Diagrams](docs/SEQUENCE_DIAGRAM.md) - Detailed authentication flows
+- 🏗️ [Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.md) - Complete system architecture
 
 ## 📚 Documentation
 
@@ -555,7 +701,7 @@ This project is licensed under the MIT License.
 For issues and questions:
 - Open an issue in the repository
 - Check the [documentation](docs/) for detailed guides
-- Review [troubleshooting section](#-troubleshooting)
+- Review [Troubleshooting](#troubleshooting) section
 
 ## 🙏 Acknowledgments
 
